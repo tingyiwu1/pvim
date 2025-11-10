@@ -8,7 +8,7 @@ downloadAppimage() {
     appimageNeeded=false
     echo "Downloading latest Neovim"
     [ -f "$imageLocation" ] && rm "$imageLocation"
-    curl -Lo "$imageLocation" https://github.com/neovim/neovim/releases/latest/download/nvim.appimage && chmod u+x "$imageLocation"
+    curl -Lo "$imageLocation" https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage && chmod u+x "$imageLocation"
   fi
 }
 
