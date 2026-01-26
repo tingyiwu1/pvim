@@ -8,7 +8,7 @@ downloadAppimage() {
     appimageNeeded=false
     echo "Downloading latest Neovim"
     [ -f "$imageLocation" ] && rm "$imageLocation"
-    curl -Lo "$imageLocation" https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage && chmod u+x "$imageLocation"
+    curl -Lo "$imageLocation" https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage && chmod u+x "$imageLocation"
   fi
 }
 
@@ -84,5 +84,10 @@ if $dashU; then
   updatepvim
 fi
 
+export XDG_CONFIG_HOME="$PVIM/config"
+export XDG_DATA_HOME="$PVIM/clutter/data"
+export XDG_STATE_HOME="$PVIM/clutter/state"
+export XDG_CACHE_HOME="$PVIM/clutter/cache"
+
 #run Neovim with the local files
-exec "$nvim" --clean -i "$PVIM/clutter/shada/state" -u "$PVIM/pvim.lua" "$@"
+exec "$nvim" -i "$PVIM/clutter/shada/state" "$@"
