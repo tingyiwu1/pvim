@@ -84,10 +84,17 @@ if $dashU; then
   updatepvim
 fi
 
-export XDG_CONFIG_HOME="$PVIM/config"
+# Explicitly use the default config location. In most cases config will be
+# cloned separately
+export XDG_CONFIG_HOME="$HOME/.config"
+
+# Use this instead to keep config in pvim folder for maximum portability
+# export XDG_CONFIG_HOME="$PVIM/config"
+
+# These should override all plugin install locations as well
 export XDG_DATA_HOME="$PVIM/clutter/data"
 export XDG_STATE_HOME="$PVIM/clutter/state"
 export XDG_CACHE_HOME="$PVIM/clutter/cache"
 
-#run Neovim with the local files
-exec "$nvim" -i "$PVIM/clutter/shada/state" "$@"
+# Run Neovim with the local files
+exec "$nvim" "$@"
