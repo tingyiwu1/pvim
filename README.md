@@ -2,34 +2,43 @@
 
 pvim, AKA seanvim, is an AllInOne-directory Neovim wrapper.
 
-pvim will download the latest Neovim appimage and contain your config and
+pvim will download the latest Neovim appimage and contain all data, state, and
 plugins to within the download directory. This should work on any linux computer
 that can run an appimage, and can be downloaded from any computer that has git
 and curl.
-
-pvim no longer assumes your plugin manager and only runs setup when you try to
-load one. If you would like to use pvim with a different plugin manager open an
-issue and I'll have a look at support.  
-Note: The plugin manager needs to have an option to change where it installs
-plugins to.
-
-## Supported plugin managers
-- [Packer.nvim](https://github.com/wbthomason/packer.nvim)
-- [Lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ## Installation
 
 Clone pvim to whatever location you wish then add it to your path.
 
 ```sh
-git clone https://github.com/RoryNesbitt/pvim
-git clone <YOURCONFIG> pvim/config
-PATH="$(pwd)/pvim:$PATH"
+cd
+git clone git@github.com:tingyiwu1/pvim.git
 ```
 
-If you are using a bootstap function you will need to add `and not
-os.getenv("PVIM")` to the if condition to avoid double downloading your plugin
-manager.
+Copy or symlink your neovim config to the default nvim config location.
+```sh
+cd && git clone git@github.com:tingyiwu1/dotfiles.git
+```
+
+Manual symlink
+```sh
+cd && ln -sr dotfiles/nvim/.config/nvim .config/nvim
+```
+
+Using stow
+```sh
+cd dotfiles && stow nvim
+```
+
+Symlink pvim executable to `~/bin`
+```sh
+cd
+mkdir -p bin
+ln -sr pvim/pvim ~/bin/nvim
+```
+
+You may need to add `~/bin` to PATH if it's not already there.
 
 ## Finding Neovim
 
@@ -44,24 +53,10 @@ force it's use with `-f` or specify an appimage location with `-i <appimage>`.
 You can then use `pvim -u` to update pvim itself, your config (if it is a git
 repo) and the appimage (if not using `-i`).
 
-## Your Config
 
-For the most part pvim can be used with any config and it will work out of the
-box, however if you have anything specifically referencing
-`vim.fn.stdpath("config")` then you can get the pvim config directory with
-`os.getenv("pvim").."/config"`. The following function will work for both cases:
-
-```lua
-local function findConfig()
-  local configDir = os.getenv("PVIM")
-  if configDir then
-    configDir = configDir.."/config"
-  else
-    configDir = vim.fn.stdpath("config")
-  end
-  return configDir
-end
-```
+## pvim Specific Neovim Config
+`os.getenv("PVIM")` will be set to the pvim directory when running pvim. This
+can be used to enable/disable plugins depending on if running in pvim.
 
 ## Known issues
 
