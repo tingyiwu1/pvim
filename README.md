@@ -18,23 +18,19 @@ git clone git@github.com:tingyiwu1/pvim.git
 
 Copy or symlink your neovim config to the default nvim config location.
 ```sh
-cd && git clone git@github.com:tingyiwu1/dotfiles.git
-```
+git clone git@github.com:tingyiwu1/dotfiles.git
 
-Manual symlink
-```sh
-cd && ln -sr dotfiles/nvim/.config/nvim .config/nvim
+# Manual symlink
+ln -sr dotfiles/nvim/.config/nvim .config/nvim
+# -- OR --
+# Using stow
+cd dotfiles
+stow nvim
 ```
-
-Using stow
-```sh
-cd dotfiles && stow nvim
-```
-
 Symlink pvim executable to `~/bin`
 ```sh
 cd
-mkdir -p bin
+mkdir -p ~/bin
 ln -sr pvim/pvim ~/bin/nvim
 ```
 
@@ -52,7 +48,6 @@ force it's use with `-f` or specify an appimage location with `-i <appimage>`.
 
 You can then use `pvim -u` to update pvim itself, your config (if it is a git
 repo) and the appimage (if not using `-i`).
-
 
 ## pvim Specific Neovim Config
 `os.getenv("PVIM")` will be set to the pvim directory when running pvim. This
