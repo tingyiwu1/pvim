@@ -3,6 +3,8 @@
 # Get the path to pvim
 export PVIM="$(dirname "$(readlink -e -- "$0")")"
 
+## TODO: check x86 or arm
+
 downloadAppimage() {
   if $appimageNeeded && [ "$imageLocation" = "$PVIM/nvim.appimage" ]; then
     appimageNeeded=false
@@ -25,17 +27,13 @@ updatepvim() {
 }
 
 dashU=false
-dashF=false
 imageLocation="$PVIM/nvim.appimage"
 dashH=false
 optrem=1
-while getopts ':ui:fh' opts; do
+while getopts ':ui:h' opts; do
   case $opts in
     u)
       dashU=true
-      ;;
-    f)
-      dashF=true
       ;;
     i)
       imageLocation="$OPTARG"
@@ -57,8 +55,6 @@ shift $((OPTIND-optrem))
 # Determine what Neovim to use
 if [ -f "$imageLocation" ]; then
   nvim="$imageLocation"
-elif command -v nvim > /dev/null && ! $dashF; then
-  nvim="nvim"
 else
   downloadAppimage
   nvim="$imageLocation"
@@ -72,7 +68,6 @@ Options:
   --                    Pass all following arguments to Neovim
 
   -u                    Update pvim, config(if git), and the appimage(if in use)
-  -f                    Force the use of appimage over installed nvim
   -i <appimage>         specify the image path
 
 Use \"pvim -- -h\" to see neovim help"
@@ -97,4 +92,38 @@ export XDG_STATE_HOME="$PVIM/clutter/state"
 export XDG_CACHE_HOME="$PVIM/clutter/cache"
 
 # Run Neovim with the local files
+# If using AppImage, try to run directly first, fall back to extracted version if FUSE is not available
+if [ "$nvim" = "$imageLocation" ] && [ -f "$imageLocation" ]; then
+  # Try to run AppImage directly, but check if we need to extract
+  extractedDir="${imageLocation}.extracted"
+  extractedBinary="$extractedDir/usr/bin/nvim"
+  
+  # If already extracted, use that
+  if [ -f "$extractedBinary" ]; then
+    exec "$extractedBinary" "$@"
+  fi
+  
+  # Try running directly first
+  if ! "$nvim" --version >/dev/null 2>&1; then
+    # Direct execution failed, likely FUSE issue - extract and use that
+    echo "AppImage FUSE mount failed, extracting contents..."
+    rm -rf "$extractedDir"
+    "$imageLocation" --appimage-extract >/dev/null 2>&1
+    # AppImage extracts to ./squashfs-root by default, move it to a consistent location
+    if [ -d "./squashfs-root" ]; then
+      mv "./squashfs-root" "$extractedDir"
+      if [ -f "$extractedBinary" ]; then
+        echo "Using extracted Neovim from $extractedDir"
+        exec "$extractedBinary" "$@"
+      else
+        echo "Error: Could not find nvim binary after extraction"
+        exit 1
+      fi
+    else
+      echo "Error: AppImage extraction failed"
+      exit 1
+    fi
+  fi
+fi
+
 exec "$nvim" "$@"
