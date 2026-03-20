@@ -3,14 +3,27 @@
 # Get the path to pvim
 export PVIM="$(dirname "$(readlink -e -- "$0")")"
 
-## TODO: check x86 or arm
+## Detect architecture
+ARCH="$(uname -m)"
+case "$ARCH" in
+  x86_64)
+    NVIM_ARCH="x86_64"
+    ;;
+  aarch64|arm64)
+    NVIM_ARCH="arm64"
+    ;;
+  *)
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+    ;;
+esac
 
 downloadAppimage() {
   if $appimageNeeded && [ "$imageLocation" = "$PVIM/nvim.appimage" ]; then
     appimageNeeded=false
-    echo "Downloading latest Neovim"
+    echo "Downloading latest Neovim for $NVIM_ARCH"
     [ -f "$imageLocation" ] && rm "$imageLocation"
-    curl -Lo "$imageLocation" https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage && chmod u+x "$imageLocation"
+    curl -Lo "$imageLocation" "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-${NVIM_ARCH}.appimage" && chmod u+x "$imageLocation"
   fi
 }
 
@@ -127,3 +140,4 @@ if [ "$nvim" = "$imageLocation" ] && [ -f "$imageLocation" ]; then
 fi
 
 exec "$nvim" "$@"
+
